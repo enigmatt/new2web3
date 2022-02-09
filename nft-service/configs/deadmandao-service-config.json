@@ -1,0 +1,15 @@
+{
+  "conf": {
+    "name": "deadmandao",
+    "modules": [
+      {
+        "name": "deadmandao-nft-service",
+        "path": "./artifacts/deadmandao-nft-service_0_5_1.wasm",
+        "mounted_binaries": [[[ "curl", "/usr/bin/curl"]]],
+        "mapped_dirs": [],
+        "preopened_files": [],
+        "logger_enabled": [true]
+      }
+    ]
+  }
+}
