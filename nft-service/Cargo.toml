@@ -1,0 +1,10 @@
+[package]
+name = "deadmandao-nft-service"
+version = "0.5.1"
+edition = "2021"
+
+[dependencies]
+fluence = "0.6.0"
+json = "0.12.0"
+marine-rs-sdk = { version = "=0.6.11", features = ["logger"] }
+log = "0.4.8"
