@@ -1,0 +1,62 @@
+import "@fluencelabs/aqua-lib/builtin.aqua"
+
+const PEER_ID ?= "12D3KooWDUszU2NeWyUVjCXhGEt1MoZrhvdmaQQwtZUriuGN1jTr"
+const SERVICE_ID ?= "d305388a-61b2-446f-805d-71465695b822"
+
+data Item:
+  id: string
+  token_id: string
+  marketplace: string
+  blockchain: string
+  name: string
+  description: string
+  detail_url: string
+  image_url: string
+
+data ItemPage:
+  marketplace: string
+  opensea_next_offset: i32
+  rarible_continuation: string
+  items: []Item
+
+data ItemPages:
+  opensea_page: ItemPage
+  rarible_page: ItemPage
+
+service DeadmandaoService:
+  download(url: string) -> string
+  get_first_opensea_page() -> ItemPage
+  get_first_rarible_page() -> ItemPage
+  get_opensea_continuation(opensea_next_offset: i32) -> ItemPage
+  get_rarible_continuation(rarible_continuation: string) -> ItemPage
+
+
+func download(url: string) -> string:
+  on PEER_ID:
+    DeadmandaoService SERVICE_ID
+    reslt <- DeadmandaoService.download(url)
+  <- reslt
+
+func get_first_opensea_page() -> ItemPage:
+  on PEER_ID:
+    DeadmandaoService SERVICE_ID
+    page <- DeadmandaoService.get_first_opensea_page()
+  <- page
+
+func get_first_rarible_page() -> ItemPage:
+  on PEER_ID:
+    DeadmandaoService SERVICE_ID
+    page <- DeadmandaoService.get_first_rarible_page()
+  <- page
+
+func get_opensea_continuation(opensea_next_offset: i32) -> ItemPage:
+  on PEER_ID:
+    DeadmandaoService SERVICE_ID
+    page <- DeadmandaoService.get_opensea_continuation(opensea_next_offset)
+  <- page
+
+func get_rarible_continuation(rarible_continuation: string) -> ItemPage:
+  on PEER_ID:
+    DeadmandaoService SERVICE_ID
+    page <- DeadmandaoService.get_rarible_continuation(rarible_continuation)
+  <- page
