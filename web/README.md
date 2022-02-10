@@ -29,3 +29,7 @@ npm start
 ```
 
 The browser window with `localhost:3000` should open
+
+## About DeadManDAO and New2Web3
+This project was created to meet the requirements of a GitCoin Schelling Point Hackathon challenge:
+https://gitcoin.co/issue/fluencelabs/gitcoin-schelling-point-hackathon/1/100027508
