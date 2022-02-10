@@ -18,33 +18,11 @@ marine aqua artifacts/deadman-nft-service-0_5_1.wasm
 
 #### Building the ReactJS user interface
 
-Change directory to the web subproject:
-
 ```bash
 cd web
-```
-
-Run npm install to download all the dependencies:
-
-```bash
 npm install
-```
-
-Run npm run compile-aqua to generate the Aqua container
-
-```bash
 npm run compile-aqua
-```
-
-Run npm run build to compile/consolidate the code
-
-```bash
 npm run build
-```
-
-Start the application
-
-```bash
 npm start
 ```
 
