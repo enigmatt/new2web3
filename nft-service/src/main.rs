@@ -1,6 +1,5 @@
 use std::include_bytes;
 
-// use fluence::marine;
 use fluence::module_manifest;
 use json;
 use json::JsonValue;
@@ -8,29 +7,26 @@ use marine_rs_sdk::marine;
 use marine_rs_sdk::WasmLoggerBuilder;
 use marine_rs_sdk::MountedBinaryResult;
 
+// main initializes the logger
 fn main() {
     WasmLoggerBuilder::new().build().unwrap();
-
-    if false {
-        let opensea_json = get_opensea_items_json();
-        if false { println!("{}", opensea_json); };
-        
-        let rarible_json = get_rarible_items_json();
-        if false { println!("{}", rarible_json); };
-        
-        let item_page = get_opensea_item_page();
-        if false { dbg!(&item_page); };
-    }
 }
 
+// I included this line because one of the Rust
+// tutorials included it. I do not know what it
+// does. :D
 module_manifest!();
 
+// Set the curl function as a call to an external
+// library.
 #[marine]
 #[link(wasm_import_module = "host")]
 extern "C" {
     fn curl(cmd: Vec<&str>) -> MountedBinaryResult;
 }
 
+// Publish the structure of the Item objects that
+// represent an NFT on either marketplace.
 #[marine]
 #[derive(Debug)]
 pub struct Item {
@@ -44,6 +40,9 @@ pub struct Item {
     pub image_url: String,
 }
 
+// Publish the structure of a page of NFT Items
+// along with the name of the marketplace it came
+// from and the information for getting the next page.
 #[marine]
 #[derive(Debug)]
 pub struct ItemPage {
@@ -53,6 +52,9 @@ pub struct ItemPage {
     pub items: Vec<Item>,
 }
 
+// Publish the structure of a pair of ItemPages, one
+// from OpenSea and one from Rarible. This is used in
+// our example of using Aqua to run calls in parallel.
 #[marine]
 #[derive(Debug)]
 pub struct ItemPages {
@@ -60,6 +62,10 @@ pub struct ItemPages {
     pub rarible_page: ItemPage,
 }
 
+// This function enables downloading of a URL as a
+// string. This is used internally to hit the OpenSea
+// and Rarible APIs. It was exposed to enable debugging,
+// but would be unexposed in production.
 #[marine]
 pub fn download(url: &str) -> String {
     log::info!("download called with url {}", url);
@@ -68,28 +74,49 @@ pub fn download(url: &str) -> String {
     String::from_utf8(result.stdout).unwrap()
 }
 
+// This function gets an initial page of JSON from OpenSea,
+// cleans up the line returns that cause the JSON parser to
+// error out, and passes the result to the parser function.
 #[marine]
 pub fn get_first_opensea_page() -> ItemPage {
-    get_opensea_item_page()
+    let json_string: String = get_opensea_items_json();
+    let json_string: String = json_string.replacen("\n", " ", 100000);
+    parse_opensea_page(&json_string)
 }
 
+// This function does not paginate because we were unable
+// to get OpenSea pagination to work. Any call we made to
+// the OpenSea API with ?offset=20&limit=20 resulted in a
+// 1020 error suggesting that we were being throttled. We
+// submitted a registration request for a production token,
+// but did not receive a response.
 #[marine]
 pub fn get_opensea_continuation(opensea_next_offset: i32) -> ItemPage {
-    get_opensea_item_page()
+    let json_string: String = get_opensea_items_json();
+    let json_string: String = json_string.replacen("\n", " ", 100000);
+    parse_opensea_page(&json_string)
 }
 
+// Pull the JSON from Rarible and pass it to the parser.
 #[marine]
 pub fn get_first_rarible_page() -> ItemPage {
     let json = get_rarible_items_json();
-    rarible_page(&json)
+    parse_rarible_page(&json)
 }
 
+// Get a continuation page JSON from Rarible and pass it
+// to the parser.
 #[marine]
 pub fn get_rarible_continuation(rarible_continuation: &str) -> ItemPage {
     let json = get_rarible_continuation_json(rarible_continuation);
-    rarible_page(&json)
+    parse_rarible_page(&json)
 }
 
+// This tiny function wraps two ItemPages in a struct and
+// passes it back. Javascript threw an error when we tried
+// to connect it to an Aqua func that returned a pair of
+// ItemPages as "ItemPage, ItemPage". This function is used
+// for the demo of parallelizing services in Aqua.
 #[marine]
 pub fn collect_these(opensea_page: ItemPage, rarible_page: ItemPage) -> ItemPages {
     ItemPages {
@@ -98,6 +125,9 @@ pub fn collect_these(opensea_page: ItemPage, rarible_page: ItemPage) -> ItemPage
     }
 }
 
+// This function parses OpenSea's JSON NFT Item structure and
+// marshalls the content into a unified Item structure used for
+// both Rarible and OpenSea, to make the front end code simpler.
 fn item_from_opensea_asset(asset: &JsonValue) -> Item {
     let id = asset["id"].as_str().unwrap_or("").to_string();
     let token_id = asset["token_id"].as_str().unwrap_or("").to_string();
@@ -113,6 +143,9 @@ fn item_from_opensea_asset(asset: &JsonValue) -> Item {
     }
 }
 
+// This function parses Rarible's JSON NFT item structure and
+// marshalls the content into a unified Item structure used for
+// both Rarible and OpenSea, to make the front end code simpler.
 fn item_from_rarible_element(element: &JsonValue) -> Option<Item> {
     let id = element["id"]
         .as_str().unwrap_or("").to_string();
@@ -150,10 +183,11 @@ fn item_from_rarible_element(element: &JsonValue) -> Option<Item> {
     }
 }
 
-fn get_opensea_item_page() -> ItemPage {
-    let json_string: String = get_opensea_items_json();
-    let json_string: String = json_string.replacen("\n", " ", 100000);
-    let parsed = json::parse(&json_string).unwrap();
+// This method takes a full OpenSea JSON page and builds
+// an ItemPage including a vector of NFT items and the
+// continuation information.
+fn parse_opensea_page(json_string: &str) -> ItemPage {
+    let parsed = json::parse(json_string).unwrap();
     let assets = &parsed["assets"];
     let mut items: Vec<Item> = Vec::new();
 
@@ -169,7 +203,10 @@ fn get_opensea_item_page() -> ItemPage {
     }
 }
 
-fn rarible_page(json_string: &str) -> ItemPage {
+// This method takes a full Rarible JSON page and builds
+// an ItemPage including a vector of NFT items and the
+// continuation information.
+fn parse_rarible_page(json_string: &str) -> ItemPage {
     let parsed = json::parse(json_string).unwrap();
     let item_elements = &parsed["items"];
     let mut items: Vec<Item>  = Vec::new();
@@ -190,24 +227,36 @@ fn rarible_page(json_string: &str) -> ItemPage {
     }
 }
 
+// Since we were regularly getting 1020 (throttle) errors from OpenSea,
+// we decided to stub out the call to OpenSea with static content
+// to ensure a successful demo. The Rarible examples in the next
+// two methods show what hitting OpenSea's API would look like if our
+// API registration had been accepted and we could include an
+// authentication token in the request header.
 fn get_opensea_items_json() -> String {
     let json_bytes = include_bytes!("opensea_list.json");
     let json_string = String::from_utf8_lossy(json_bytes);
     json_string.to_string()
 }
 
-fn get_rarible_continuation_json(continuation: &str) -> String {
-    // https://api.rarible.org/v0.1/items/all?size=20&continuation=ETHEREUM:1643760949000_0x966731dfd9b9925dd105ff465687f5aa8f54ee9f:2040;TEZOS:1643760966000_KT1Cdfc4Ynz4WTZn4aX12wG2tpT88WXJCQAF:7;FLOW:1643760952544_A.0b2a3299cc857e29.TopShot:21281652
-    let mut continuation_url =
-        String::from("https://api.rarible.org/v0.1/items/all?size=20&continuation=");
-    continuation_url.push_str(continuation);
-    download(&continuation_url)
-}
-
+// This method hits the Rarible API for an initial page of NFT items
+// and returns the response as a String. During initial testing we found
+// that the content of the list was quite complete, obviating the need
+// for a subsequent call to the item detail API for each NFT.
 fn get_rarible_items_json() -> String {
     // let json_bytes = include_bytes!("rarible_list.json");
     // let json_string = String::from_utf8_lossy(json_bytes);
     // json_string.to_string()
     let rarible_url = "https://api.rarible.org/v0.1/items/all?size=20";
     download(rarible_url)
+}
+
+// This method hits the Rarible API for a continuation page of NFT
+// items and returns the response as a string.
+fn get_rarible_continuation_json(continuation: &str) -> String {
+    // https://api.rarible.org/v0.1/items/all?size=20&continuation=ETHEREUM:1643760949000_0x966731dfd9b9925dd105ff465687f5aa8f54ee9f:2040;TEZOS:1643760966000_KT1Cdfc4Ynz4WTZn4aX12wG2tpT88WXJCQAF:7;FLOW:1643760952544_A.0b2a3299cc857e29.TopShot:21281652
+    let mut continuation_url =
+        String::from("https://api.rarible.org/v0.1/items/all?size=20&continuation=");
+    continuation_url.push_str(continuation);
+    download(&continuation_url)
 }
