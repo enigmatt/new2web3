@@ -100,8 +100,8 @@ function App() {
         <h1>DeadManDAO presents New2Web3</h1><img src={isConnected ? loadedLogo : logo} className="logo" alt="logo"/>
         <h3>An implementation of Fluence's Aqua and Marine to integrate with: 
         </h3>
-        <img src={raribleLogo} alt="Rarible Logo"/>
-         <img src={openSeaLogo} alt="OpenSea Logo"/>
+        <a href="https://rarible.com/"><img src={raribleLogo} alt="Rarible Logo"/></a>
+        <a href="https://opensea.io/"><img src={openSeaLogo} alt="OpenSea Logo"/></a>
       </header>
 
       <div className="content">
@@ -127,7 +127,7 @@ function App() {
                     <table className="uppity">
                       <tbody>
                         <tr><td className="bold">Description</td><td>{raribleResult.items[0].description}</td></tr>
-                        <tr><td className="bold">ID</td><td>{raribleResult.items[0].id}</td></tr>
+                        <tr><td className="bold">Name</td><td>{raribleResult.items[0].name}</td></tr>
                       </tbody>
                     </table>
                   </td>
@@ -140,7 +140,7 @@ function App() {
                     <table className="uppity">
                       <tbody>
                         <tr><td className="bold">Description</td><td>{raribleResult.items[1].description}</td></tr>
-                        <tr><td className="bold">ID</td><td>{raribleResult.items[1].id}</td></tr>
+                        <tr><td className="bold">Name</td><td>{raribleResult.items[1].name}</td></tr>
                       </tbody>
                     </table>
                   </td>
@@ -153,7 +153,7 @@ function App() {
                     <table className="uppity">
                       <tbody>
                         <tr><td className="bold">Description</td><td>{raribleResult.items[2].description}</td></tr>
-                        <tr><td className="bold">ID</td><td>{raribleResult.items[2].id}</td></tr>
+                        <tr><td className="bold">Name</td><td>{raribleResult.items[2].name}</td></tr>
                       </tbody>
                     </table>
                   </td>
@@ -176,7 +176,6 @@ function App() {
                         <tbody>
                         <tr><td className="bold">Name</td><td>{openseaResult.items[0].name}</td></tr>
                           <tr><td className="bold">Description</td><td>{openseaResult.items[0].description}</td></tr>
-                          <tr><td className="bold">ID</td><td>{openseaResult.items[0].blockchain}":"{openseaResult.items[0].token_id}</td></tr>
                         </tbody>
                       </table>
                     </td>
@@ -190,7 +189,6 @@ function App() {
                         <tbody>
                         <tr><td className="bold">Name</td><td>{openseaResult.items[1].name}</td></tr>
                           <tr><td className="bold">Description</td><td>{openseaResult.items[1].description}</td></tr>
-                          <tr><td className="bold">ID</td><td>{openseaResult.items[1].blockchain}":"{openseaResult.items[1].token_id}</td></tr>
                         </tbody>
                       </table>
                     </td>
@@ -204,7 +202,6 @@ function App() {
                         <tbody>
                           <tr><td className="bold">Name</td><td>{openseaResult.items[2].name}</td></tr>
                           <tr><td className="bold">Description</td><td>{openseaResult.items[2].description}</td></tr>
-                          <tr><td className="bold">ID</td><td>{openseaResult.items[2].blockchain}":"{openseaResult.items[2].token_id}</td></tr>
                         </tbody>
                       </table>
                     </td>
