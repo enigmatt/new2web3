@@ -1,6 +1,8 @@
-# New2Web3
+#DeadManDAO presents New2Web3
+A simple example of using a ReactJS frontend to make calls to WebAssembly Rust services decentralized on the Fluence servers.
+Our demo video can be found at:
 
-Web interface for the New2Web3 application
+https://youtu.be/dLQdivDMJJE
 
 ## Getting started
 
@@ -28,8 +30,10 @@ Start the application
 npm start
 ```
 
-The browser window with `localhost:3000` should open
+A browser window with `localhost:3000` should open automatically.
 
 ## About DeadManDAO and New2Web3
 This project was created to meet the requirements of a GitCoin Schelling Point Hackathon challenge:
 https://gitcoin.co/issue/fluencelabs/gitcoin-schelling-point-hackathon/1/100027508
+
+####A big thanks for the Schelling Point folks and GitCoin for making this possible!
