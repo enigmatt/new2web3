@@ -1,0 +1,30 @@
+* Introduction
+** Old Folks on Web3
+*** Matt: TI/99, 1980 - TCP Dec 1995
+*** Bob: TRS-80, 1980 - Cleveland Freenet 1992
+*** 84 years combined programming experience
+*** 57 years combined Internet experience
+*** Worldwide network connectivity, connecting factories in South Korea, Mexico
+*** Web1 Decentralization
+*** New to Web3, whose cultural values resonate with this old Web1 hacker.
+* Demo
+** User Experience
+** Limited scope, as we are new to Web3, Fluence, Rust, React, TypeScript
+** You /can/ teach old dogs new tricks!
+* Code Features
+** Marine Rust service layer.
+*** Curl and transform the two flavors of JSON doc into a common struct.
+*** Having troubles accessing production OpenSea, that is stubbed out.
+** Aqua process control layer.
+*** Basic calls that can be orchestrated directly by JavaScript
+*** Advanced call that invokes OpenSea and Rarible first pages in parallel.
+*** Impressed with how easy service composition is in Aqua.
+** JavaScript, TypeScript, React UX layer.
+*** Simplified to demonstrate basic capability while learning as fast as we can.
+* Lessons Learned
+** First impressions can be deceiving, stay open to discovery.
+*** I thought the magic was in the Rust and Javascript. We will be spending more time with Aqua, which seems very promising for the data engineering and data science workflows I would like to do.
+** Even simple things are hard when you are new to almost everything in a platform.
+** Web3 is a fascinating space, holding even more promise than my rather optimistic perspective a few weeks ago when we started looking at this hackathon.
+* Summary
+** This has been an exciting first foray into Web3. You will be seeing more of us!
