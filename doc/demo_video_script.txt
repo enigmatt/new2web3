@@ -4,9 +4,7 @@
 *** Bob: TRS-80, 1980 - Cleveland Freenet 1992
 *** 84 years combined programming experience
 *** 57 years combined Internet experience
-*** Worldwide network connectivity, connecting factories in South Korea, Mexico
-*** Web1 Decentralization
-*** New to Web3, whose cultural values resonate with this old Web1 hacker.
+*** New to Web3, Fluence, Rust, Typescript, and React
 * Demo
 ** User Experience
 ** Limited scope, as we are new to Web3, Fluence, Rust, React, TypeScript

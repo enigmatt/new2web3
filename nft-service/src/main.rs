@@ -1,3 +1,5 @@
+// ========== Imports =================
+
 use std::include_bytes;
 
 use fluence::module_manifest;
@@ -7,26 +9,10 @@ use marine_rs_sdk::marine;
 use marine_rs_sdk::WasmLoggerBuilder;
 use marine_rs_sdk::MountedBinaryResult;
 
-// main initializes the logger
-fn main() {
-    WasmLoggerBuilder::new().build().unwrap();
-}
+// ========== Structs =================
 
-// I included this line because one of the Rust
-// tutorials included it. I do not know what it
-// does. :D
-module_manifest!();
-
-// Set the curl function as a call to an external
-// library.
-#[marine]
-#[link(wasm_import_module = "host")]
-extern "C" {
-    fn curl(cmd: Vec<&str>) -> MountedBinaryResult;
-}
-
-// Publish the structure of the Item objects that
-// represent an NFT on either marketplace.
+// Publish the structure of the Item objects that represent an NFT
+// on either marketplace.
 #[marine]
 #[derive(Debug)]
 pub struct Item {
@@ -40,9 +26,9 @@ pub struct Item {
     pub image_url: String,
 }
 
-// Publish the structure of a page of NFT Items
-// along with the name of the marketplace it came
-// from and the information for getting the next page.
+// Publish the structure of a page of NFT Items along with the name
+// of the marketplace it came from and the information for getting
+// the next page.
 #[marine]
 #[derive(Debug)]
 pub struct ItemPage {
@@ -52,9 +38,9 @@ pub struct ItemPage {
     pub items: Vec<Item>,
 }
 
-// Publish the structure of a pair of ItemPages, one
-// from OpenSea and one from Rarible. This is used in
-// our example of using Aqua to run calls in parallel.
+// Publish the structure of a pair of ItemPages, one from OpenSea and
+// one from Rarible. This is used in our example of using Aqua to run
+// calls in parallel.
 #[marine]
 #[derive(Debug)]
 pub struct ItemPages {
@@ -62,21 +48,40 @@ pub struct ItemPages {
     pub rarible_page: ItemPage,
 }
 
-// This function enables downloading of a URL as a
-// string. This is used internally to hit the OpenSea
-// and Rarible APIs. It was exposed to enable debugging,
-// but would be unexposed in production.
+// ========== Initialization =================
+
+// I included this line because one of the Rust tutorials included
+// it. I do not know what it does. :D
+module_manifest!();
+
+// main initializes the logger
+fn main() {
+    WasmLoggerBuilder::new().build().unwrap();
+}
+
+// ========== External Library Links =================
+
+// Set the curl function as a call to an external library.
+#[marine]
+#[link(wasm_import_module = "host")]
+extern "C" {
+    fn curl(cmd: Vec<&str>) -> MountedBinaryResult;
+}
+
+// This function enables URL downloading. This is used to hit the
+// OpenSea and Rarible Web APIs.
 #[marine]
 pub fn download(url: &str) -> String {
     log::info!("download called with url {}", url);
-    
     let result = unsafe { curl(vec![url]) };
     String::from_utf8(result.stdout).unwrap()
 }
 
-// This function gets an initial page of JSON from OpenSea,
-// cleans up the line returns that cause the JSON parser to
-// error out, and passes the result to the parser function.
+// ========== Public Functions =================
+
+// This function gets an initial page of JSON from OpenSea, cleans up
+// the line returns that cause the JSON parser to error out, and passes
+// the result to the parser function.
 #[marine]
 pub fn get_first_opensea_page() -> ItemPage {
     let json_string: String = get_opensea_items_json();
@@ -84,12 +89,11 @@ pub fn get_first_opensea_page() -> ItemPage {
     parse_opensea_page(&json_string)
 }
 
-// This function does not paginate because we were unable
-// to get OpenSea pagination to work. Any call we made to
-// the OpenSea API with ?offset=20&limit=20 resulted in a
-// 1020 error suggesting that we were being throttled. We
-// submitted a registration request for a production token,
-// but did not receive a response.
+// This function does not actually paginate because we were unable
+// to get OpenSea pagination to work. Any call we made to the OpenSea
+// API with ?offset=20&limit=20 resulted in a 1020 error suggesting
+// that we were being throttled. We submitted a registration request
+// for a production token, but did not receive a response.
 #[marine]
 pub fn get_opensea_continuation(opensea_next_offset: i32) -> ItemPage {
     let json_string: String = get_opensea_items_json();
@@ -124,6 +128,8 @@ pub fn collect_these(opensea_page: ItemPage, rarible_page: ItemPage) -> ItemPage
         rarible_page,
     }
 }
+
+// ========== JSON Parsing =================
 
 // This function parses OpenSea's JSON NFT Item structure and
 // marshalls the content into a unified Item structure used for
@@ -226,6 +232,8 @@ fn parse_rarible_page(json_string: &str) -> ItemPage {
         items,
     }
 }
+
+// ========== NFT Marketplace API Calls =================
 
 // Since we were regularly getting 1020 (throttle) errors from OpenSea,
 // we decided to stub out the call to OpenSea with static content
