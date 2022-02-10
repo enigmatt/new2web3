@@ -17,6 +17,7 @@ type RaribleResult = Unpromise<ReturnType<typeof get_first_rarible_page>>;
 type OpenseaResult = Unpromise<ReturnType<typeof get_first_opensea_page>>;
 
 function App() {
+  /* useState hooks for Fluence connectivity as well as status for OpenSea and Rarible queries */
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isRaribleLoaded, setIsRaribleLoaded] = useState<boolean>(false);
   const [isRaribleLoading, setIsRaribleLoading] = useState<boolean>(false);
@@ -30,13 +31,7 @@ function App() {
       .catch((err) => console.log("Client initialization failed", err));
   }, [isConnected]);
 
-  const setDisconnected = () => {
-    setIsConnected(false);
-    setIsRaribleLoaded(false);
-    setIsRaribleLoading(false);
-    setIsOpenseaLoaded(false);
-    setIsOpenseaLoading(false);
-  }
+  /* setConnected does more than toggle the useState.  It also kicks off the Rarible and OpenSea initial loading. */
   const setConnected = () => {
     setIsConnected(true);
     if (isRaribleLoading === false) {
@@ -49,7 +44,7 @@ function App() {
     }
   }
 
-
+  /* Ansynchronous function to try and pull down the first set of Rarible NFTs via the Marine->Rust module */
   const doGetFirstRariblePage = async () => {
     if (!isConnected) {
       return;
@@ -67,16 +62,7 @@ function App() {
     }
     setIsRaribleLoading(false);
   }
-  const clearFlagsAndLoadRarible = () => {
-    setIsRaribleLoaded(false);
-    setIsRaribleLoading(true);
-    doGetFirstRariblePage();
-  }
-  const clearFlagsAndLoadOpenSea = () => {
-    setIsOpenseaLoaded(false);
-    setIsOpenseaLoading(true);
-    doGetFirstOpenSeaPage();
-  }
+  /* Asynchronous function to try and pull down the first set of OpenSea NFTs via the Marin->Rust module */
   const doGetFirstOpenSeaPage = async () => {
     if (!isConnected) {
       return;
@@ -94,6 +80,21 @@ function App() {
     }
     setIsOpenseaLoading(false);
   }
+
+  /* Clear associated flags before calligng doGetFirstRariblePage */
+  const clearFlagsAndLoadRarible = () => {
+    setIsRaribleLoaded(false);
+    setIsRaribleLoading(true);
+    doGetFirstRariblePage();
+  }
+  /* Clear associated flags before calligng doGetFirstOpenSeaPage */
+  const clearFlagsAndLoadOpenSea = () => {
+    setIsOpenseaLoaded(false);
+    setIsOpenseaLoading(true);
+    doGetFirstOpenSeaPage();
+  }
+
+  /* ReactJS's token return of the entire HTML page with embedded JavaScript-like functionality */
   return (
     <div className="App">
       <header>
@@ -108,12 +109,14 @@ function App() {
         <h3>{isConnected ? "Fluence Node Connected" : "Connecting to Fluence"}</h3>
         <div>
 
+/* buttons for reloading Rarible and OpenSea - These services are heavily hit and frequently time out. */
           <div className="row">
           <button onClick={() => clearFlagsAndLoadRarible()}>{isRaribleLoaded ? 'Rarible NFTs Loaded' : isRaribleLoading ? 'Getting Rarible NFTs' : 'Get Rarible NFTs'} </button>
           <button onClick={() => clearFlagsAndLoadOpenSea()}>{isOpenseaLoaded ? 'OpenSea NFTs Loaded' : isOpenseaLoading ? 'Getting OpenSea NFTs' : 'Get OpenSea NFTs'}</button>
           </div>
         </div>
-
+/* And now... to present the NFT images and brief descriptions... In a very hackish manner. */
+/* The correct way to do this would be to use ReactDOM.render and a map of the result set. */
         {raribleResult && (
           <div>
             <p className="success">Rarible returned {raribleResult.items.length} items</p>
@@ -162,6 +165,7 @@ function App() {
             </table>
           </div>
         )}
+/* And now... to present the OpenSea NFT images and brief descriptions... */
         {openseaResult && (
           <div>
             <p className="success">OpenSea returned {openseaResult.items.length} items</p>
