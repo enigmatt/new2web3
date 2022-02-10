@@ -1,4 +1,4 @@
-#DeadManDAO presents New2Web3
+# DeadManDAO presents New2Web3
 A simple example of using a ReactJS frontend to make calls to WebAssembly Rust services decentralized on the Fluence servers.
 Our demo video can be found at:
 
